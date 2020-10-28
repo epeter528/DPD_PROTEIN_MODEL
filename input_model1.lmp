@@ -1,0 +1,309 @@
+# checking boundary conditions test 1
+
+boundary p p p
+#processors 1 1 2
+
+units		lj
+atom_style      full	
+atom_modify map array
+
+read_data       output.txt
+
+#read_restart dump2.restart.2475000
+
+bond_style      harmonic
+ 
+bond_coeff      1 1E+5 0.3 # unit distance along backbone increased
+bond_coeff      2 1E+5 0.1 
+bond_coeff      3 1E+5 0.2
+
+angle_style     harmonic
+ 
+angle_coeff     2 1.0  120.0
+angle_coeff     1 1.0  0.0
+angle_coeff     3 1.0  60.0
+angle_coeff     4 7.5   0.0
+angle_coeff     5 1.0   90.0
+angle_coeff     6 1.0   90.0
+angle_coeff     7 1.0   71.0 # comparably stiff dihedrals and angles 
+
+dihedral_style harmonic
+
+dihedral_coeff  1 1.0 1 1   
+dihedral_coeff  2 1.0 1 1  # from 100 to 1 # comparably stiff dihedrals and angles 
+
+group 1 type 1
+group 2 type 2
+group 3 type 3
+#group water type 1 2 3 1 
+group water  type 12 13 14
+group dipole type 2 3 4 13 14
+
+neighbor 0.3 bin   
+neigh_modify  delay 0 every 1 check yes 
+#neigh_modify  exclude molecule water
+neigh_modify  exclude molecule water 
+neigh_modify  exclude type 2 3
+neigh_modify  exclude type 2 4
+neigh_modify  exclude type 3 4
+neigh_modify  exclude molecule dipole
+
+#neigh_modify  exclude type 1 5
+
+# -DPD-
+#to store velocities by ghost atoms
+communicate single vel yes
+
+pair_style hybrid/overlay dpd 1.0 2.0 34387 coul/long 1.5 # lower temperature
+
+kspace_style pppmd 1.0e-4
+
+pair_coeff  1 1 dpd  5.0  4.0  1.0
+pair_coeff  1 2 dpd  5.0   4.0  1.0 # very low interaction along backbone
+pair_coeff  1 3 dpd  0.0   4.0  1.0
+pair_coeff  1 4 dpd  0.0   4.0  1.0
+pair_coeff  1 5 dpd  5.0   4.0  1.0
+pair_coeff  1 6 dpd  5.0   4.0  1.0
+pair_coeff  1 7 dpd  5.0  4.0  1.0
+pair_coeff  1 8 dpd  5.0   4.0  1.0
+pair_coeff  1 9 dpd  5.0   4.0  1.0
+pair_coeff  1 10 dpd  5.0   4.0  1.0 # very low level of interation with sidechains
+pair_coeff  1 11 dpd  5.0   4.0  1.0 # very low level of interaction with C-term
+pair_coeff  1 12 dpd  15.0   4.0  1.0 # increased from 12 to 14  # increased # medium level repulsion with water
+pair_coeff  1 13 dpd  0.0   4.0  1.0
+pair_coeff  1 14 dpd  0.0   4.0  1.0 # no interaction with water Drude particles
+pair_coeff  1 15 dpd  5.0  4.0  1.0
+pair_coeff  2 2 dpd  15.0   4.0  1.0  # decreased from 25 to 15  # increased from 5 to 10 # decreased to a low level of interaction # medium level repulsion along backbone
+pair_coeff  2 3 dpd  0.0   4.0  1.0
+pair_coeff  2 4 dpd  0.0   4.0  1.0
+pair_coeff  2 5 dpd  10.0   4.0  1.0 # backbone medium repulsive to sidechain
+pair_coeff  2 6 dpd  15.0   4.0  1.0
+pair_coeff  2 7 dpd  15.0  4.0  1.0  # backbone medium repulsive to sidechain
+pair_coeff  2 8 dpd  15.0   4.0  1.0
+pair_coeff  2 9 dpd  15.0   4.0  1.0
+pair_coeff  2 10 dpd 15.0   4.0  1.0
+pair_coeff  2 11 dpd 15.0   4.0  1.0
+pair_coeff  2 12 dpd 20.0   4.0  1.0 # increased from 12 to 14 # increased  # water accessible to backbone
+pair_coeff  2 13 dpd  0.0   4.0  1.0
+pair_coeff  2 14 dpd  0.0   4.0  1.0
+pair_coeff  2 15 dpd 5.0  4.0  1.0 # very low interaction along backbone
+pair_coeff  3 3 dpd  0.0   4.0  1.0
+pair_coeff  3 4 dpd  0.0   4.0  1.0
+pair_coeff  3 5 dpd  0.0   4.0  1.0
+pair_coeff  3 6 dpd  0.0   4.0  1.0
+pair_coeff  3 7 dpd  0.0  4.0  1.0
+pair_coeff  3 8 dpd  0.0   4.0  1.0
+pair_coeff  3 9 dpd  0.0   4.0  1.0
+pair_coeff  3 10 dpd 0.0   4.0  1.0
+pair_coeff  3 11 dpd 0.0   4.0  1.0
+pair_coeff  3 12 dpd 0.0   4.0  1.0 #overlap allowed # no overlap allowed !
+pair_coeff  3 13 dpd  0.0   4.0  1.0
+pair_coeff  3 14 dpd  0.0   4.0  1.0
+pair_coeff  3 15 dpd 0.0  4.0  1.0
+pair_coeff  4 4 dpd  0.0   4.0  1.0
+pair_coeff  4 5 dpd  0.0   4.0  1.0
+pair_coeff  4 6 dpd  0.0   4.0  1.0
+pair_coeff  4 7 dpd  0.0  4.0  1.0
+pair_coeff  4 8 dpd  0.0   4.0  1.0
+pair_coeff  4 9 dpd  0.0   4.0  1.0
+pair_coeff  4 10 dpd 0.0   4.0  1.0
+pair_coeff  4 11 dpd 0.0   4.0  1.0
+pair_coeff  4 12 dpd 0.0   4.0  1.0 #overlap allowed # no overlap allowed !
+pair_coeff  4 13 dpd  0.0   4.0  1.0
+pair_coeff  4 14 dpd  0.0   4.0  1.0
+pair_coeff  4 15 dpd 0.0  4.0  1.0
+pair_coeff  5 5 dpd  10.0   4.0  1.0  # sidechain sidechain 
+pair_coeff  5 6 dpd  10.0   4.0  1.0
+pair_coeff  5 7 dpd  10.0  4.0  1.0
+pair_coeff  5 8 dpd  10.0   4.0  1.0
+pair_coeff  5 9 dpd  10.0   4.0  1.0
+pair_coeff  5 10 dpd 10.0   4.0  1.0
+pair_coeff  5 11 dpd 10.0   4.0  1.0
+pair_coeff  5 12 dpd 15.0   4.0  1.0 # increased from 12 to 14  # water accessible
+pair_coeff  5 13 dpd  0.0   4.0  1.0
+pair_coeff  5 14 dpd  0.0   4.0  1.0
+pair_coeff  5 15 dpd 10.0  4.0  1.0
+pair_coeff  6 6 dpd   5.0   4.0  1.0 # hyphob vs. hyphob
+pair_coeff  6 7 dpd   5.0  4.0  1.0
+pair_coeff  6 8 dpd   5.0   4.0  1.0
+pair_coeff  6 9 dpd   5.0   4.0  1.0
+pair_coeff  6 10 dpd 15.0   4.0  1.0
+pair_coeff  6 11 dpd 15.0   4.0  1.0 # hyphob vs. hyphil
+pair_coeff  6 12 dpd 20.0   4.0 1.0 # 20 to 25 # hyphob vs. water
+pair_coeff  6 13 dpd  0.0   4.0  1.0
+pair_coeff  6 14 dpd  0.0   4.0  1.0
+pair_coeff  6 15 dpd 15.0  4.0  1.0
+pair_coeff  7 7 dpd   5.0  4.0  1.0 # polar polar
+pair_coeff  7 8 dpd  15.0   4.0  1.0 # polar hyphob
+pair_coeff  7 9 dpd   5.0   4.0  1.0
+pair_coeff  7 10 dpd  5.0   4.0  1.0
+pair_coeff  7 11 dpd  5.0   4.0  1.0
+pair_coeff  7 12 dpd  8.0   4.0  1.0  # increased  # increased # water accessible to polar
+pair_coeff  7 13 dpd  0.0   4.0  1.0
+pair_coeff  7 14 dpd  0.0   4.0  1.0
+pair_coeff  7 15 dpd 10.0  4.0  1.0
+pair_coeff  8 8 dpd   5.0   4.0  1.0 # decreased
+pair_coeff  8 9 dpd  10.0   4.0  1.0 # decreased
+pair_coeff  8 10 dpd 10.0   4.0  1.0 # decreased
+pair_coeff  8 11 dpd 10.0   4.0  1.0 # decreased
+pair_coeff  8 12 dpd 30.0   4.0  1.0  # increased  ## hyphobic
+pair_coeff  8 13 dpd  0.0   4.0  1.0
+pair_coeff  8 14 dpd  0.0   4.0  1.0
+pair_coeff  8 15 dpd 15.0  4.0  1.0
+pair_coeff  9 9 dpd   5.0   4.0  1.0
+pair_coeff  9 10 dpd  5.0   4.0  1.0
+pair_coeff  9 11 dpd  5.0   4.0  1.0
+pair_coeff  9 12 dpd 15.0   4.0  1.0  # increased # increased
+pair_coeff  9 13 dpd  0.0   4.0  1.0
+pair_coeff  9 14 dpd  0.0   4.0  1.0
+pair_coeff  9 15 dpd  5.0  4.0  1.0
+pair_coeff  10 10 dpd 5.0   4.0  1.0
+pair_coeff  10 11 dpd 5.0   4.0  1.0
+pair_coeff  10 12 dpd 15.0   4.0  1.0  # increased  # increased
+pair_coeff  10 13 dpd  0.0   4.0  1.0
+pair_coeff  10 14 dpd  0.0   4.0  1.0
+pair_coeff  10 15 dpd  5.0  4.0  1.0
+pair_coeff  11 11 dpd 10.0   4.0  1.0
+pair_coeff  11 12 dpd 15.0   4.0  1.0 # increased 
+pair_coeff  11 13 dpd  0.0   4.0  1.0
+pair_coeff  11 14 dpd  0.0   4.0  1.0
+pair_coeff  11 15 dpd  10.0 4.0  1.0
+pair_coeff  12 12 dpd  35.0   4.0  1.0
+pair_coeff  12 13 dpd  0.0   4.0  1.0
+pair_coeff  12 14 dpd  0.0   4.0  1.0
+pair_coeff  12 15 dpd 15.0 4.0  1.0 # increased from 5 to 10
+pair_coeff  13 13 dpd  0.0   4.0  1.0
+pair_coeff  13 14 dpd  0.0   4.0  1.0
+pair_coeff  13 15 dpd  0.0 4.0  1.0
+pair_coeff  14 14 dpd  0.0   4.0  1.0
+pair_coeff  14 15 dpd  0.0   4.0 1.0
+pair_coeff  15 15 dpd  5.0  4.0 1.0
+
+set type 1 charge  1.0 
+set type 2 charge  0.0
+set type 3 charge  -0.25
+set type 4 charge   0.25 # increased from 0.1 to 0.25 # high backbone dipolar moment
+set type 5 charge  -0.2
+set type 6 charge  0.0
+set type 7 charge  -0.2
+set type 8 charge  0.0
+set type 9 charge  -0.4
+set type 10 charge  0.4
+set type 11 charge  -1
+set type 12 charge  0.0
+set type 13 charge  -0.75
+set type 14 charge   0.75
+set type 15 charge  +0.2
+
+pair_coeff 1 1  coul/long
+pair_coeff 1 2  coul/long  
+pair_coeff 1 3  coul/long
+pair_coeff 1 4  coul/long
+pair_coeff 1 5  coul/long
+pair_coeff 1 6  coul/long
+pair_coeff 1 7  coul/long
+pair_coeff 1 8  coul/long
+pair_coeff 1 9  coul/long
+pair_coeff 1 10  coul/long
+pair_coeff 1 11  coul/long
+pair_coeff 1 12  coul/long
+pair_coeff 1 13  coul/long
+pair_coeff 1 14  coul/long
+pair_coeff 1 15  coul/long
+pair_coeff 3 3  coul/long
+pair_coeff 3 4  coul/long
+pair_coeff 3 5  coul/long
+pair_coeff 3 6  coul/long
+pair_coeff 3 7  coul/long
+pair_coeff 3 8  coul/long
+pair_coeff 3 9  coul/long
+pair_coeff 3 10  coul/long
+pair_coeff 3 11  coul/long
+pair_coeff 3 12  coul/long
+pair_coeff 3 13  coul/long
+pair_coeff 3 14  coul/long
+pair_coeff 3 15  coul/long
+pair_coeff 4 4  coul/long
+pair_coeff 4 5  coul/long
+pair_coeff 4 6  coul/long
+pair_coeff 4 7  coul/long
+pair_coeff 4 8  coul/long
+pair_coeff 4 9  coul/long
+pair_coeff 4 10  coul/long
+pair_coeff 4 11  coul/long
+pair_coeff 4 12  coul/long
+pair_coeff 4 13  coul/long
+pair_coeff 4 14  coul/long
+pair_coeff 4 15  coul/long
+pair_coeff 5 5  coul/long
+pair_coeff 5 6  coul/long
+pair_coeff 5 7  coul/long
+pair_coeff 5 8  coul/long
+pair_coeff 5 9  coul/long
+pair_coeff 5 10  coul/long
+pair_coeff 5 11  coul/long
+pair_coeff 5 12  coul/long
+pair_coeff 5 13  coul/long
+pair_coeff 5 14  coul/long
+pair_coeff 5 15  coul/long
+pair_coeff 7 7  coul/long
+pair_coeff 7 8  coul/long
+pair_coeff 7 9  coul/long
+pair_coeff 7 10  coul/long
+pair_coeff 7 11  coul/long
+pair_coeff 7 12  coul/long
+pair_coeff 7 13  coul/long
+pair_coeff 7 14  coul/long
+pair_coeff 7 15  coul/long
+pair_coeff 9 9  coul/long
+pair_coeff 9 10  coul/long
+pair_coeff 9 11  coul/long
+pair_coeff 9 12  coul/long
+pair_coeff 9 13  coul/long
+pair_coeff 9 14  coul/long
+pair_coeff 9 15  coul/long
+pair_coeff 10 10  coul/long
+pair_coeff 10 11  coul/long
+pair_coeff 10 12  coul/long
+pair_coeff 10 13  coul/long
+pair_coeff 10 14  coul/long
+pair_coeff 10 15  coul/long
+pair_coeff 11 11  coul/long
+pair_coeff 11 12  coul/long
+pair_coeff 11 13  coul/long
+pair_coeff 11 14  coul/long
+pair_coeff 11 15  coul/long
+pair_coeff 13 13  coul/long
+pair_coeff 13 14  coul/long
+pair_coeff 13 15  coul/long
+pair_coeff 14 14  coul/long
+pair_coeff 14 15  coul/long
+pair_coeff 15 15  coul/long
+
+dielectric 78.0
+
+fix 1 all nve
+
+thermo          100
+#timestep	0.0001
+
+#run 5000
+
+#restart 30.0 dump.restart
+
+#dump mydump2 all xyz 2500 dump_chain_atom.xyz
+
+#compute myRDF23 all rdf 500 1 1 
+
+#fix 3 all ave/time 10 30.0 100000  c_myRDF23 file RDF23.rdf mode vector
+#fix 6 all ave/time 1 10 100  c_myMU file MU.xyz mode vector
+
+restart 5000 dump2.restart
+dump 1 all xtc 250 traj1.xtc
+ 
+
+thermo 500
+timestep 0.0001
+
+run    5000000
+
